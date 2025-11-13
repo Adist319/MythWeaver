@@ -161,22 +161,22 @@ User
 
 ## **Setup (uv)**
 
-### 1. Create virtual environment
+### 1. Install dependencies
+
+```
+uv sync
+```
+
+### 2. Create virtual environment
 
 ```
 uv venv
 ```
 
-### 2. Activate
+### 3. Activate
 
 ```
 source .venv/bin/activate
-```
-
-### 3. Install dependencies
-
-```
-uv add gradio anthropic openai google-generativeai huggingface_hub diffusers pydantic fastapi
 ```
 
 ### 4. Run
@@ -187,7 +187,7 @@ uv run app.py
 
 ---
 
-## **Suggested Project Structure**
+## **Planned Project Structure**
 
 ```
 /mythweaver
