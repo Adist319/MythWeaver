@@ -1,74 +1,65 @@
 # **MythWeaver**
 
-**Autonomous MCP-powered storytelling and map-driven adventure engine**
-**Track:** mcp-in-action-track-creative, mcp-in-action-track-consumer
-**Sponsors integrated:** Anthropic, OpenAI, Google Gemini, HuggingFace, Modal, SambaNova, ElevenLabs, Blaxel
-
----
-
 ## **Overview**
 
-MythWeaver is a multimodal, agentic storytelling system built with Gradio and powered by the Model Context Protocol (MCP). Users write actions, make choices, and upload hand-drawn or digital maps. MythWeaver interprets drawings, converts them into structured scene graphs, generates clean maps, and uses long-context memory to produce consistent adventure narratives.
-
-The goal is to demonstrate autonomous planning, tool use, MCP server integration, and multimodal reasoning in a consumer-friendly, creative application.
+MythWeaver is a multimodal, agentic storytelling system built with Gradio and the Model Context Protocol (MCP). Users interact through text and optional map/sketch uploads. The system interprets drawings, converts them into structured scene graphs, generates cleaned maps, and uses long-context memory for consistent narrative progression.
 
 ---
 
 ## **Features**
 
-* Text-based interactive adventures
-* User-steered or semi-autonomous narration
-* Map/sketch upload
-* Vision parsing of drawings into scene structures
+* Text-based adventures with user-steered or semi-autonomous narration
+* Sketch / map upload for geography-driven storytelling
+* Vision parsing into structured scene graphs
 * High-resolution map generation
-* Long-context world memory (NPCs, regions, timeline, inventory)
-* Dynamic LLM model selection
-* Full sponsor-integrated MCP tool chain
-* Responsive Gradio 6 UI
+* Long-context world memory (regions, NPCs, quests, inventory, timeline)
+* Dynamic model selection
+* MCP tool integrations for multimodal reasoning
+* Gradio 6 interface with mobile support
 
 ---
 
-## **Architecture Diagram (Text Version)**
+## **Architecture (Text Diagram)**
 
 ```
 User
  └── Gradio UI
        ├── Text Input
-       ├── Image Upload (maps)
+       ├── Image Upload
        ├── Model Selector
        └── Settings Panel
              │
              ▼
-      Claude 3.7 Sonnet (Anthropic - Primary Orchestrator)
+      Claude 4.5 Sonnet (Anthropic, Orchestrator)
              │
              ├── Gemini Vision MCP (Google)
              │       → Image → Scene Graph
              │
-             ├── Image Generator MCP (HuggingFace / Flux / Nano Banana)
+             ├── Map Generator MCP (HuggingFace / Flux / Nano Banana)
              │       → Scene Graph → Clean Map
              │
-             ├── Fast Text Utility MCP (OpenAI GPT-5.1)
-             │       → Summaries, transforms, procedural text functions
+             ├── Fast Text MCP (OpenAI GPT-5.1)
+             │       → Summaries, transforms, procedural utilities
              │
              ├── Memory Store MCP
              │       → Persistent world state
              │
-             ├── Modal Task MCP
-             │       → Heavy compute / batch map operations
+             ├── Modal Tasks MCP
+             │       → Heavy compute / batch jobs
              │
-             ├── Blaxel Filter MCP
-             │       → Redaction, sanitization
+             ├── Blaxel MCP
+             │       → Sanitization, redaction
              │
              ├── ElevenLabs MCP
-             │       → Audio narration
+             │       → Optional audio narration
              │
              └── SambaNova MCP
-                     → Low-cost tagging + memory compression
+                     → Low-cost tagging and memory compression
              │
              ▼
-      Gradio Output Layer
+      Gradio Output Display
              ├── Story Text
-             ├── Updated Map
+             ├── Generated Maps
              └── Suggested Actions
 ```
 
@@ -76,178 +67,132 @@ User
 
 ## **Tech Stack**
 
-### **Frontend / UI**
+### **Frontend**
 
 * Gradio 6
-* Chat interface
+* Chat component
 * Image upload
-* Gallery viewer
-* Settings panel (tone, autonomy, world complexity)
-* Dropdown for model selection
-* Mobile-responsive layout
+* Gallery display
+* Model selector
+* User settings panel
 
-### **Primary LLM**
+### **Orchestrator Model**
 
-* Claude 4.5 Sonnet (Anthropic)
+* Claude 4.5 Sonnet
 
-  * Responsible for planning, narrative consistency, context retention, tool scheduling, and world logic.
+  * Controls planning, narrative consistency, tool selection, memory updates, and context management.
 
-### **Secondary LLM Tools (MCP)**
+### **MCP Tools**
 
 * **Google Gemini Vision**
 
-  * Parses uploaded images into structured scene graphs.
-
+  * Scene graph extraction from uploaded sketches
 * **HuggingFace / Flux / Nano Banana Image Generator**
 
-  * Produces cleaned, stylized maps.
-
+  * Map generation from structured scene layouts
 * **OpenAI GPT-5.1**
 
-  * Fast procedural text generation
-  * Code-like utilities
-  * Cleanup tasks
+  * Fast text utilities and procedural generation
+* **Memory MCP**
 
-### **Sponsor Tool Integrations**
+  * Persistent world state storage
+* **Modal MCP**
 
-* **Modal:** Heavy compute or batch operations
-* **ElevenLabs:** Optional voice narration
-* **Blaxel:** Input sanitization + privacy filtering
-* **SambaNova:** Low-cost inference for tagging/compression
+  * Heavy compute tasks
+* **Blaxel MCP**
+
+  * Input sanitization
+* **ElevenLabs MCP**
+
+  * Optional narration audio
+* **SambaNova MCP**
+
+  * Low-cost tagging and compression
 
 ---
 
 ## **Agentic Capabilities**
 
 * Multi-step narrative planning
-* Dynamic tool routing and error recovery
-* Scene graph reasoning
-* World memory system
-* Semi-autonomous storytelling mode
-* Tool-driven map generation and consistency checking
-* Long-context memory for storyline and world state
+* Autonomous tool routing
+* Scene graph reasoning and validation
+* World memory system (long-context)
+* Map generation pipeline
+* Semi-autonomous mode for faster storytelling
 
 ---
 
 ## **User Flow**
 
 1. User starts an adventure.
-2. User enters a prompt or uploads a map sketch.
-3. Claude determines whether to call MCP tools.
-4. If image provided:
+2. User enters text or uploads a sketch/map.
+3. Orchestrator evaluates intent and tool requirements.
+4. If image uploaded:
 
-   * Gemini Vision: scene graph
-   * Map Generator: cleaned map
-5. Claude updates world memory (regions, NPCs, quests, inventory).
-6. Claude produces story continuation.
-7. Gradio displays:
-
-   * Story text
-   * Generated/updated map
-   * Suggested next actions
+   * Gemini Vision → scene graph
+   * Map Generator → cleaned/stylized map
+5. Memory MCP updated with regions, NPCs, quests, inventory, timeline.
+6. Claude 4.5 Sonnet generates story continuation.
+7. Gradio displays story, maps, and possible actions.
 
 ---
 
-## **MCP Tools Used**
+## **MCP Tools Summary**
 
-### **Scene Parser (Gemini Vision)**
-
-**Input:** Image
-**Output:** Structured scene graph with objects, terrain, notes, coordinates.
-
-### **Map Generator (HF Image Model / Nano Banana)**
-
-**Input:** Scene graph or text description
-**Output:** High-resolution map image
-
-### **Memory MCP**
-
-Persistent world state:
-
-* NPCs
-* Regions
-* Plot threads
-* Inventory
-* Timeline events
-
-### **OpenAI MCP (Fast Text Ops)**
-
-* Summaries
-* Cleanup
-* Procedural utilities
-
-### **Modal MCP**
-
-* Heavy image preprocessing
-* Parallel operations
-
-### **Blaxel MCP**
-
-* Sanitization and PII removal
-
-### **ElevenLabs MCP**
-
-* Audio narration
-
-### **SambaNova MCP**
-
-* Cheap classification / memory compression
+| Tool          | Purpose                 |
+| ------------- | ----------------------- |
+| Gemini Vision | Sketch → scene graph    |
+| Map Generator | Scene graph → map image |
+| Memory Store  | Persistent world model  |
+| GPT-5.1       | Text utilities          |
+| Modal Tasks   | Heavy/batch operations  |
+| Blaxel        | Sanitization            |
+| ElevenLabs    | Audio narration         |
+| SambaNova     | Tagging + compression   |
 
 ---
 
-## **Installation**
+## **Setup (uv)**
+
+### **1. Create virtual environment**
 
 ```
-pip install gradio anthropic openai google-generativeai huggingface_hub diffusers pydantic fastapi
+uv venv
 ```
 
-Additional MCP tools are located in `mcp-tools/`.
-
----
-
-## **Running Locally**
+### **2. Activate**
 
 ```
-python app.py
+source .venv/bin/activate
+```
+
+### **3. Install dependencies**
+
+```
+uv add gradio anthropic openai google-generativeai huggingface_hub diffusers pydantic fastapi
+```
+
+### **4. Run**
+
+```
+uv run app.py
 ```
 
 ---
 
-## **Submission Checklist**
-
-* [x] Gradio application
-* [x] MCP tool integration
-* [x] Autonomous reasoning and planning
-* [x] Multimodal input support
-* [x] Sponsor tools used
-* [x] Documentation included
-* [x] Demo-ready structure
-
----
-
-## **Demo Video Outline**
-
-1. Start a new story
-2. Upload a hand-drawn sketch
-3. Show scene graph extraction
-4. Show the generated map
-5. User makes a choice
-6. Story progresses with memory updates
-7. Optional but nice to have: ElevenLabs narration
-
----
-
-## **Project Structure (planned)**
+## **Suggested Project Structure**
 
 ```
 /mythweaver
   ├── app.py
   ├── README.md
-  ├── requirements.txt
+  ├── uv.lock
+  ├── requirements.txt (optional)
   ├── /mcp-tools
   │     ├── gemini_vision/
   │     ├── map_generator/
   │     ├── memory_store/
+  │     ├── openai_tools/
   │     ├── modal_tasks/
   │     ├── blaxel_filter/
   │     ├── elevenlabs_audio/
@@ -255,7 +200,47 @@ python app.py
   ├── /assets
   │     └── example_maps/
   ├── /prompts
-  │     └── orchestrator_prompt.md
+  │     └── orchestrator.md
   └── /utils
         └── helpers.py
 ```
+
+---
+
+## **Running on HuggingFace Spaces**
+
+Add to `README.md` or `Space Description`:
+
+```
+space:
+  app_file: app.py
+  python_version: "3.10"
+  sdk: gradio
+  sdk_version: 6.x
+```
+
+---
+
+## **Submission Requirements**
+
+* Gradio app: complete
+* MCP tools: integrated
+* Autonomous agent behavior: included
+* Multimodal support: included
+* Sponsor APIs: included
+* Documentation: provided
+* Demo-flow supported
+
+---
+
+## **Demo Outline**
+
+1. Start new world
+2. Upload hand-drawn sketch
+3. Scene graph displayed (optional)
+4. Map generated
+5. Story continuation
+6. User choices
+7. Optional audio narration
+
+---
