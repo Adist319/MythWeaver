@@ -1,8 +1,6 @@
-# **MythWeaver**
-
 ## **Overview**
 
-MythWeaver is a multimodal, agentic storytelling system built with Gradio and the Model Context Protocol (MCP). Users interact through text and optional map/sketch uploads. The system interprets drawings, converts them into structured scene graphs, generates cleaned maps, and uses long-context memory for consistent narrative progression.
+MythWeaver is a multimodal, agentic storytelling system built with Gradio and the Model Context Protocol (MCP). Users interact through text and optional map/sketch uploads. The system interprets drawings, converts them into structured scene graphs, generates cleaned maps, and uses long-context memory for consistent narrative progression. The Auto-Quest Engine dynamically generates optional quests based on the world state, locations, NPCs, and story progression.
 
 ---
 
@@ -15,6 +13,7 @@ MythWeaver is a multimodal, agentic storytelling system built with Gradio and th
 * Long-context world memory (regions, NPCs, quests, inventory, timeline)
 * Dynamic model selection
 * MCP tool integrations for multimodal reasoning
+* Auto-Quest Engine generating map-aware objectives and quests
 * Gradio 6 interface with mobile support
 
 ---
@@ -31,6 +30,10 @@ User
              │
              ▼
       Claude 4.5 Sonnet (Anthropic, Orchestrator)
+             ├── World-memory reasoning
+             ├── Quest opportunity detection
+             ├── Multi-objective quest generation
+             └── Tool-driven map-aware planning
              │
              ├── Gemini Vision MCP (Google)
              │       → Image → Scene Graph
@@ -56,10 +59,14 @@ User
              └── SambaNova MCP
                      → Low-cost tagging and memory compression
              │
+             └── Auto-Quest Engine (internal module)
+                     → memory + scene graph → quest proposals
+             │
              ▼
       Gradio Output Display
              ├── Story Text
              ├── Generated Maps
+             ├── Quest Options
              └── Suggested Actions
 ```
 
@@ -73,6 +80,7 @@ User
 * Chat component
 * Image upload
 * Gallery display
+* Quest selection UI elements
 * Model selector
 * User settings panel
 
@@ -80,34 +88,29 @@ User
 
 * Claude 4.5 Sonnet
 
-  * Controls planning, narrative consistency, tool selection, memory updates, and context management.
+  * Planning
+  * Narrative consistency
+  * Tool selection
+  * Memory updates
+  * Quest detection and generation
 
 ### **MCP Tools**
 
-* **Google Gemini Vision**
+* **Google Gemini Vision** — scene graph extraction
+* **HuggingFace / Flux / Nano Banana** — high-resolution map generation
+* **OpenAI GPT-5.1** — fast procedural text utilities
+* **Memory MCP** — persistent world state
+* **Modal MCP** — heavy compute tasks
+* **Blaxel MCP** — sanitization
+* **ElevenLabs MCP** — optional narration
+* **SambaNova MCP** — tagging & compression
 
-  * Scene graph extraction from uploaded sketches
-* **HuggingFace / Flux / Nano Banana Image Generator**
+### **Internal Modules**
 
-  * Map generation from structured scene layouts
-* **OpenAI GPT-5.1**
+* **Auto-Quest Engine**
 
-  * Fast text utilities and procedural generation
-* **Memory MCP**
-
-  * Persistent world state storage
-* **Modal MCP**
-
-  * Heavy compute tasks
-* **Blaxel MCP**
-
-  * Input sanitization
-* **ElevenLabs MCP**
-
-  * Optional narration audio
-* **SambaNova MCP**
-
-  * Low-cost tagging and compression
+  * Generates 1–3 map-aware quests using world memory
+  * Produces structured objectives, difficulty, path hints, NPC ties
 
 ---
 
@@ -116,9 +119,10 @@ User
 * Multi-step narrative planning
 * Autonomous tool routing
 * Scene graph reasoning and validation
-* World memory system (long-context)
-* Map generation pipeline
-* Semi-autonomous mode for faster storytelling
+* World memory management
+* Quest opportunity detection
+* Map-aware quest generation
+* Semi-autonomous storytelling modes
 
 ---
 
@@ -126,53 +130,56 @@ User
 
 1. User starts an adventure.
 2. User enters text or uploads a sketch/map.
-3. Orchestrator evaluates intent and tool requirements.
+3. Orchestrator determines required tools.
 4. If image uploaded:
 
    * Gemini Vision → scene graph
    * Map Generator → cleaned/stylized map
-5. Memory MCP updated with regions, NPCs, quests, inventory, timeline.
+5. Memory MCP updated with locations, NPCs, quests, inventory, and timeline events.
 6. Claude 4.5 Sonnet generates story continuation.
-7. Gradio displays story, maps, and possible actions.
+7. Auto-Quest Engine proposes dynamic quest options.
+8. Gradio displays story, maps, and optional quests.
+9. User selects a quest or continues freely.
 
 ---
 
 ## **MCP Tools Summary**
 
-| Tool          | Purpose                 |
-| ------------- | ----------------------- |
-| Gemini Vision | Sketch → scene graph    |
-| Map Generator | Scene graph → map image |
-| Memory Store  | Persistent world model  |
-| GPT-5.1       | Text utilities          |
-| Modal Tasks   | Heavy/batch operations  |
-| Blaxel        | Sanitization            |
-| ElevenLabs    | Audio narration         |
-| SambaNova     | Tagging + compression   |
+| Tool                        | Purpose                     |
+| --------------------------- | --------------------------- |
+| Gemini Vision               | Sketch → scene graph        |
+| Map Generator               | Scene graph → map image     |
+| Memory Store                | Persistent world model      |
+| GPT-5.1                     | Text utilities & transforms |
+| Modal Tasks                 | Heavy/batch operations      |
+| Blaxel                      | Sanitization                |
+| ElevenLabs                  | Audio narration             |
+| SambaNova                   | Tagging & compression       |
+| **Quest Engine (internal)** | Structured quest generation |
 
 ---
 
 ## **Setup (uv)**
 
-### **1. Create virtual environment**
+### 1. Create virtual environment
 
 ```
 uv venv
 ```
 
-### **2. Activate**
+### 2. Activate
 
 ```
 source .venv/bin/activate
 ```
 
-### **3. Install dependencies**
+### 3. Install dependencies
 
 ```
 uv add gradio anthropic openai google-generativeai huggingface_hub diffusers pydantic fastapi
 ```
 
-### **4. Run**
+### 4. Run
 
 ```
 uv run app.py
@@ -197,50 +204,38 @@ uv run app.py
   │     ├── blaxel_filter/
   │     ├── elevenlabs_audio/
   │     └── sambanova_inference/
+  ├── /utils
+  │     ├── helpers.py
+  │     └── quest_engine.py
   ├── /assets
   │     └── example_maps/
   ├── /prompts
   │     └── orchestrator.md
-  └── /utils
-        └── helpers.py
-```
-
----
-
-## **Running on HuggingFace Spaces**
-
-Add to `README.md` or `Space Description`:
-
-```
-space:
-  app_file: app.py
-  python_version: "3.10"
-  sdk: gradio
-  sdk_version: 6.x
 ```
 
 ---
 
 ## **Submission Requirements**
 
-* Gradio app: complete
-* MCP tools: integrated
-* Autonomous agent behavior: included
-* Multimodal support: included
-* Sponsor APIs: included
-* Documentation: provided
-* Demo-flow supported
+* Gradio 6 app with MCP integrations
+* Autonomous agentic behavior demonstrated
+* Auto-Quest Engine active
+* Multimodal pipeline (vision + map generation)
+* Documentation included
+* Demo video (1–5 minutes)
+* Social media link included
+* Submitted under the MCP-1st-Birthday organization
 
 ---
 
 ## **Demo Outline**
 
-1. Start new world
+1. Start new adventure
 2. Upload hand-drawn sketch
-3. Scene graph displayed (optional)
-4. Map generated
+3. Scene graph extraction
+4. Map generation
 5. Story continuation
-6. User choices
-7. Optional audio narration
-
----
+6. Auto-Quest Engine proposes quests
+7. User selects quest or continues
+8. Updated map + narrative progression
+9. Optional: audio narration
