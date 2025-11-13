@@ -173,25 +173,7 @@ Output:
 uv sync
 ```
 
-### 2. Create virtual environment
-
-```bash
-uv venv
-```
-
-### 3. Activate
-
-```
-source .venv/bin/activate
-```
-
-### 3. Install dependencies
-
-```
-uv add gradio anthropic openai google-generativeai huggingface_hub diffusers pydantic fastapi
-```
-
-### 4. Run the app
+### 2. Run the app
 
 ```bash
 uv run python app.py
