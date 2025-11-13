@@ -1,19 +1,26 @@
 ## **Overview**
 
-MythWeaver is a multimodal, agentic storytelling system built with Gradio and the Model Context Protocol (MCP). Users interact through text and optional map/sketch uploads. The system interprets drawings, converts them into structured scene graphs, generates cleaned maps, and uses long-context memory for consistent narrative progression. The Auto-Quest Engine dynamically generates optional quests based on the world state, locations, NPCs, and story progression.
+MythWeaver is a multimodal, agentic storytelling system built with Gradio and the Model Context Protocol (MCP). The core innovation is a **custom Narrative Engine MCP server** that exposes context-aware narrative generation as a reusable tool for ANY application. Users interact through text and optional map/sketch uploads. The system interprets drawings, converts them into structured scene graphs, generates styled maps, and uses the Narrative Engine MCP to dynamically generate objectives, plot hooks, and narrative opportunities.
+
+**Novel Contribution:** The Narrative Engine MCP server provides domain-agnostic narrative generation tools that can be used by games, interactive fiction, writing tools, tabletop RPG assistants, and educational applications.
 
 ---
 
 ## **Features**
 
+### **Core MCP Innovation**
+* **Narrative Engine MCP Server** - Novel, reusable MCP tool for narrative generation
+  * Analyzes structured context (world state, entities, relationships, scene graphs)
+  * Generates narrative objectives, plot hooks, conflicts, and resolutions
+  * Domain-agnostic design works for stories, games, education, writing tools
+  * Exposes standardized MCP interface with multiple tools
+
+### **Application Features**
 * Text-based adventures with user-steered or semi-autonomous narration
 * Sketch / map upload for geography-driven storytelling
-* Vision parsing into structured scene graphs
-* High-resolution map generation
-* Long-context world memory (regions, NPCs, quests, inventory, timeline)
-* Dynamic model selection
-* MCP tool integrations for multimodal reasoning
-* Auto-Quest Engine generating map-aware objectives and quests
+* Vision parsing into structured scene graphs (Gemini Vision MCP)
+* High-resolution map generation (Flux/SDXL MCP)
+* Long-context world memory (Memory Store MCP)
 * Gradio 6 interface with mobile support
 
 ---
@@ -25,50 +32,38 @@ User
  └── Gradio UI
        ├── Text Input
        ├── Image Upload
-       ├── Model Selector
-       └── Settings Panel
+       └── Quest Selection
              │
              ▼
       Claude 4.5 Sonnet (Anthropic, Orchestrator)
              ├── World-memory reasoning
-             ├── Quest opportunity detection
-             ├── Multi-objective quest generation
-             └── Tool-driven map-aware planning
+             ├── Narrative generation
+             ├── Tool selection & routing
+             └── Multi-step planning
+             │
+             ├── ⭐ Narrative Engine MCP (CUSTOM - Our Novel Contribution)
+             │       → generate_narrative_objectives(context, genre, count)
+             │       → analyze_narrative_opportunities(scene_graph, entities)
+             │       → Returns structured objectives with narrative hooks
              │
              ├── Gemini Vision MCP (Google)
-             │       → Image → Scene Graph
+             │       → parse_scene(image) → Scene Graph
              │
-             ├── Map Generator MCP (HuggingFace / Flux / Nano Banana)
-             │       → Scene Graph → Clean Map
+             ├── Map Generator MCP (Flux/SDXL)
+             │       → generate_map(scene_graph) → Styled Map Image
              │
-             ├── Fast Text MCP (OpenAI GPT-5.1)
-             │       → Summaries, transforms, procedural utilities
-             │
-             ├── Memory Store MCP
-             │       → Persistent world state
-             │
-             ├── Modal Tasks MCP
-             │       → Heavy compute / batch jobs
-             │
-             ├── Blaxel MCP
-             │       → Sanitization, redaction
-             │
-             ├── ElevenLabs MCP
-             │       → Optional audio narration
-             │
-             └── SambaNova MCP
-                     → Low-cost tagging and memory compression
-             │
-             └── Auto-Quest Engine (internal module)
-                     → memory + scene graph → quest proposals
+             └── Memory Store MCP
+                     → update_world(locations, NPCs, events)
+                     → query_world() → World State
              │
              ▼
       Gradio Output Display
              ├── Story Text
              ├── Generated Maps
-             ├── Quest Options
-             └── Suggested Actions
+             └── Quest Options
 ```
+
+**Key:** ⭐ = Novel MCP server built for this hackathon
 
 ---
 
@@ -76,86 +71,97 @@ User
 
 ### **Frontend**
 
-* Gradio 6
-* Chat component
-* Image upload
-* Gallery display
-* Quest selection UI elements
-* Model selector
-* User settings panel
+* Gradio 6 - Chat interface with image upload and quest selection
 
 ### **Orchestrator Model**
 
-* Claude 4.5 Sonnet
+* Claude 4.5 Sonnet - Planning, narrative generation, tool routing
 
-  * Planning
-  * Narrative consistency
-  * Tool selection
-  * Memory updates
-  * Quest detection and generation
+### **MCP Servers (4 Core Tools)**
 
-### **MCP Tools**
+| MCP Server | Purpose | Status |
+|------------|---------|--------|
+| **⭐ Narrative Engine MCP** | **Context-aware narrative generation** | **Custom - Our contribution** |
+| **Gemini Vision MCP** | Scene graph extraction from sketches | Existing |
+| **Map Generator MCP** | High-resolution map generation | Existing/Custom |
+| **Memory Store MCP** | Persistent world state | Existing |
 
-* **Google Gemini Vision** — scene graph extraction
-* **HuggingFace / Flux / Nano Banana** — high-resolution map generation
-* **OpenAI GPT-5.1** — fast procedural text utilities
-* **Memory MCP** — persistent world state
-* **Modal MCP** — heavy compute tasks
-* **Blaxel MCP** — sanitization
-* **ElevenLabs MCP** — optional narration
-* **SambaNova MCP** — tagging & compression
+### **Narrative Engine MCP Server Details**
 
-### **Internal Modules**
+**Tools Exposed:**
 
-* **Auto-Quest Engine**
+```python
+# Tool 1: generate_narrative_objectives
+Input:
+  - context: dict         # World state, entities, relationships
+  - narrative_style: str  # Genre/tone (fantasy, sci-fi, mystery, etc.)
+  - count: int           # Number of objectives (1-5)
+  - difficulty: str      # easy, medium, hard
 
-  * Generates 1–3 map-aware quests using world memory
-  * Produces structured objectives, difficulty, path hints, NPC ties
+Output:
+  - List of objectives with:
+    - description: str
+    - narrative_hook: str       # Why this matters to the story
+    - success_criteria: list
+    - conflicts: list           # Potential obstacles/antagonists
+    - related_entities: list    # NPCs, locations involved
+    - estimated_complexity: str
+
+# Tool 2: analyze_narrative_opportunities
+Input:
+  - scene_graph: dict    # Structured scene data
+  - character_state: dict # Character relationships, goals, conflicts
+
+Output:
+  - List of narrative opportunities:
+    - opportunity_type: str  # conflict, mystery, romance, discovery, etc.
+    - description: str
+    - involved_entities: list
+    - dramatic_potential: float
+```
+
+**Implementation:**
+* Python MCP server using `mcp` SDK
+* LLM-powered analysis (Claude for reasoning, structured outputs)
+* Pydantic schemas for type safety
+* Domain-agnostic design - works for any narrative context
 
 ---
 
 ## **Agentic Capabilities**
 
-* Multi-step narrative planning
-* Autonomous tool routing
+* Multi-step narrative planning via Claude orchestration
+* Autonomous tool routing based on user input
 * Scene graph reasoning and validation
-* World memory management
-* Quest opportunity detection
-* Map-aware quest generation
-* Semi-autonomous storytelling modes
+* World memory management and updates
+* Context-aware narrative generation via Narrative Engine MCP
+* Semi-autonomous storytelling flow
 
 ---
 
 ## **User Flow**
 
-1. User starts an adventure.
-2. User enters text or uploads a sketch/map.
-3. Orchestrator determines required tools.
-4. If image uploaded:
-
-   * Gemini Vision → scene graph
-   * Map Generator → cleaned/stylized map
-5. Memory MCP updated with locations, NPCs, quests, inventory, and timeline events.
-6. Claude 4.5 Sonnet generates story continuation.
-7. Auto-Quest Engine proposes dynamic quest options.
-8. Gradio displays story, maps, and optional quests.
-9. User selects a quest or continues freely.
+1. User starts an adventure with text or uploads a sketch/map
+2. **If image uploaded:**
+   * Gemini Vision MCP → extracts scene graph
+   * Map Generator MCP → creates styled map
+3. Memory Store MCP → updates world state
+4. Claude orchestrator → generates story continuation
+5. **Narrative Engine MCP** → analyzes context and generates 1-3 dynamic objectives
+6. Gradio displays: story text, map, and quest options
+7. User selects a quest or continues exploration
+8. Loop repeats with updated memory and context
 
 ---
 
 ## **MCP Tools Summary**
 
-| Tool                        | Purpose                     |
-| --------------------------- | --------------------------- |
-| Gemini Vision               | Sketch → scene graph        |
-| Map Generator               | Scene graph → map image     |
-| Memory Store                | Persistent world model      |
-| GPT-5.1                     | Text utilities & transforms |
-| Modal Tasks                 | Heavy/batch operations      |
-| Blaxel                      | Sanitization                |
-| ElevenLabs                  | Audio narration             |
-| SambaNova                   | Tagging & compression       |
-| **Quest Engine (internal)** | Structured quest generation |
+| Tool | Purpose | Type |
+|------|---------|------|
+| **⭐ Narrative Engine MCP** | **Context-aware narrative generation** | **Custom** |
+| Gemini Vision MCP | Sketch → scene graph | Existing |
+| Map Generator MCP | Scene graph → map image | Existing/Custom |
+| Memory Store MCP | Persistent world state | Existing |
 
 ---
 
@@ -169,7 +175,7 @@ uv sync
 
 ### 2. Create virtual environment
 
-```
+```bash
 uv venv
 ```
 
@@ -179,63 +185,94 @@ uv venv
 source .venv/bin/activate
 ```
 
-### 4. Run
+### 3. Install dependencies
 
 ```
-uv run app.py
+uv add gradio anthropic openai google-generativeai huggingface_hub diffusers pydantic fastapi
+```
+
+### 4. Run the app
+
+```bash
+uv run python app.py
 ```
 
 ---
 
-## **Planned Project Structure**
+## **Suggested Project Structure**
 
 ```
 /mythweaver
-  ├── app.py
+  ├── app.py                          # Main Gradio application
   ├── README.md
-  ├── uv.lock
-  ├── requirements.txt (optional)
-  ├── /mcp-tools
-  │     ├── gemini_vision/
-  │     ├── map_generator/
-  │     ├── memory_store/
-  │     ├── openai_tools/
-  │     ├── modal_tasks/
-  │     ├── blaxel_filter/
-  │     ├── elevenlabs_audio/
-  │     └── sambanova_inference/
-  ├── /utils
-  │     ├── helpers.py
-  │     └── quest_engine.py
-  ├── /assets
-  │     └── example_maps/
+  ├── pyproject.toml
+  ├── .gitignore
+  │
+  ├── /mcp_servers
+  │     └── narrative_engine/         # ⭐ Custom Narrative Engine MCP Server
+  │           ├── server.py           # MCP server implementation
+  │           ├── schemas.py          # Pydantic models for narrative objects
+  │           ├── generator.py        # LLM-powered narrative logic
+  │           └── README.md           # Standalone documentation for reuse
+  │
+  ├── /mcp_clients                    # Client integrations for existing MCP servers
+  │     ├── gemini_vision.py          # Gemini Vision MCP client
+  │     ├── map_generator.py          # Map Generator MCP client
+  │     └── memory_store.py           # Memory Store MCP client
+  │
   ├── /prompts
-  │     └── orchestrator.md
+  │     ├── orchestrator.md           # Claude system prompt
+  │     └── narrative_generation.md   # Narrative Engine prompt
+  │
+  ├── /demos
+  │     └── cli_demo.py               # Standalone CLI using Narrative Engine MCP
+  │
+  └── /assets
+        └── example_maps/             # Sample sketches for testing
 ```
 
 ---
 
-## **Submission Requirements**
+## **Hackathon Submission Checklist**
 
-* Gradio 6 app with MCP integrations
-* Autonomous agentic behavior demonstrated
-* Auto-Quest Engine active
-* Multimodal pipeline (vision + map generation)
-* Documentation included
-* Demo video (1–5 minutes)
-* Social media link included
-* Submitted under the MCP-1st-Birthday organization
+- [ ] **Custom Narrative Engine MCP Server** - Novel, reusable tool with clear API
+- [ ] **MythWeaver Gradio app** - Primary demo using Narrative Engine
+- [ ] **CLI demo** - Second app proving reusability
+- [ ] **Multimodal pipeline** (sketch → scene graph → map → narrative objectives)
+- [ ] **Autonomous agent behavior** via Claude orchestration
+- [ ] **Standalone MCP documentation** - So others can integrate it
+- [ ] **Demo video** (1-5 minutes showing both apps)
+- [ ] **Social media post** with #MCPBirthday hashtag
+- [ ] **GitHub repo** submitted to MCP-1st-Birthday organization
+
+## **Why This Is Novel**
+
+1. **First Narrative Generation MCP Server** - No existing MCP tool does context-aware story generation
+2. **Domain-Agnostic Design** - Works for fantasy, sci-fi, mysteries, education, etc.
+3. **Proven Reusability** - Two separate demo apps using the same MCP server
+4. **Standardized Interface** - Clean APIs that any MCP client can call
+5. **Multi-Agent Orchestration** - Shows MCP servers working together in complex workflow
 
 ---
 
-## **Demo Outline**
+## **Demo Flow**
 
-1. Start new adventure
-2. Upload hand-drawn sketch
-3. Scene graph extraction
-4. Map generation
-5. Story continuation
-6. Auto-Quest Engine proposes quests
-7. User selects quest or continues
-8. Updated map + narrative progression
-9. Optional: audio narration
+1. **Start adventure** - Text input or sketch upload
+2. **Vision parsing** - Gemini Vision MCP extracts scene graph
+3. **Map generation** - Map Generator MCP creates styled map
+4. **Story generation** - Claude orchestrator writes narrative
+5. **Objective generation** - **Narrative Engine MCP** analyzes context and proposes 1-3 narrative objectives
+6. **User interaction** - Select quest or continue exploration
+7. **Memory update** - Memory Store MCP persists world changes
+8. **Loop** - Repeat with updated context
+
+## **Expected Impact**
+
+The Narrative Engine MCP server can be adopted by:
+
+* **Game developers** - Dynamic quest/objective generation for RPGs and adventure games
+* **Interactive fiction platforms** - Branching narrative suggestions (Twine, ChoiceScript, etc.)
+* **Writing tools** - Context-aware plot suggestions and story prompts (Scrivener, Obsidian plugins)
+* **Tabletop RPG tools** - AI Dungeon Master assistance (Roll20, Foundry VTT)
+* **Educational apps** - Generate story-based learning scenarios
+* **Creative AI apps** - Any app needing narrative context understanding
