@@ -18,6 +18,17 @@
 * [ ] Add timeout wrapper for slow calls
 * [ ] Add structured logging (`json` logs)
 * [ ] Add `validate_env()` (fail fast if keys missing)
+* [ ] Add telemetry recording: latency, tool-call sequence, fallback events
+
+---
+
+# 🧠 PHASE 0.5 — Claude Prompt Hardening (Critical for Stability)
+
+* [ ] Freeze Orchestrator Prompt v1 in `prompts/orchestrator.md`
+* [ ] Add tool-call sanity checks (validate MCP responses before use)
+* [ ] Add self-diagnostic step for Claude (verify tool availability)
+* [ ] Add cost + token guardrails (max tokens per turn, budget alerts)
+* [ ] Test orchestrator with edge cases (malformed inputs, empty responses)
 
 ---
 
@@ -124,6 +135,8 @@ mythweaver/
 * [ ] Schema validation
 * [ ] Long context
 * [ ] Randomized fuzz tests
+* [ ] JSON fixture tests (production-grade validation)
+* [ ] Regression tests (output schema consistency across seeds)
 
 ## 2.6 CLI Demo
 
@@ -191,12 +204,17 @@ mythweaver/
 * [ ] Autoplay
 * [ ] On/off toggle
 
-## 5.2 UX Polish
+## 5.2 UX Polish (User Experience Narrative)
 
 * [ ] Clean message formatting
-* [ ] Smooth map reveal
+* [ ] Smooth map reveal with fade-in animation
 * [ ] Error popups
 * [ ] Loading animations
+* [ ] Quest buttons rendered as scroll/parchment cards (ornate styling)
+* [ ] Story text streaming like RPG dialog box
+* [ ] Background parchment texture
+* [ ] Map viewer with vintage cartography styling
+* [ ] Audio narration controls feel integrated, not tacked-on
 
 ## 5.3 Observability
 
@@ -216,12 +234,17 @@ mythweaver/
 
 # 🚀 PHASE 6 — Deployment & Submission (Days 16–17)
 
-## 6.1 HuggingFace Spaces
+## 6.1 HuggingFace Spaces (Risk: CPU-only Mode)
 
 * [ ] Generate `requirements.txt` from pyproject
 * [ ] Add secrets in HF dashboard
-* [ ] Validate CPU-only fallback
+* [ ] Validate CPU-only fallback mode
 * [ ] Confirm modal → HF call works
+* [ ] CPU-only validation steps:
+  * [ ] Mock scene graph generation
+  * [ ] Mock map generation (placeholder image)
+  * [ ] Mock narrative objectives (fallback to Claude-only)
+  * [ ] Test full pipeline without GPU dependencies
 
 ## 6.2 Demo Video (3–5 min)
 
@@ -248,7 +271,35 @@ mythweaver/
 * [ ] MCP_SERVER.md
 * [ ] Demo GIFs
 
-## 6.4 Final Submission
+## 6.4 Local Demo Scripts (Judge Friendliness)
+
+* [ ] Add simple demo commands to README:
+  ```bash
+  # Full multimodal experience
+  uv run python app.py
+
+  # CLI reusability demo
+  uv run python demos/cli_demo.py
+  ```
+* [ ] Ensure both scripts work out-of-the-box with `.env` setup
+* [ ] Add sample assets for instant testing (example map sketch)
+
+## 6.5 Judge Walkthrough Mode (Secret Weapon)
+
+* [ ] Add `?demo=true` URL parameter to auto-run demo sequence
+  OR
+* [ ] Add "Run Demo" button in Gradio UI
+* [ ] Demo sequence (90 seconds):
+  * [ ] Auto-load sample map sketch
+  * [ ] Auto-extract scene graph
+  * [ ] Auto-generate objectives
+  * [ ] Auto-select first quest
+  * [ ] Auto-continue story with map generation
+  * [ ] Show full pipeline without judge fumbling UI
+* [ ] Add demo mode toggle in settings
+* [ ] Pre-cache demo assets for instant load
+
+## 6.6 Final Submission
 
 * [ ] HF Space URL
 * [ ] GitHub repo
@@ -256,7 +307,7 @@ mythweaver/
 * [ ] Sponsor summary
 * [ ] Highlight innovation:
 
-  > “Narrative Engine MCP — a reusable, domain-agnostic narrative generation server powering multiple clients.”
+  > "Narrative Engine MCP — a reusable, domain-agnostic narrative generation server powering multiple clients."
 
 ---
 
