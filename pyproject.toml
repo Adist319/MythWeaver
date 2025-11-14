@@ -8,30 +8,24 @@ readme = "README.md"
 requires-python = ">=3.10,<3.12"
 
 dependencies = [
-    "gradio>=5.49.0,<6.0.0",
-
     # Anthropic SDK — 0.72.x is the last pre-1.x release widely published
     "anthropic>=0.72.0,<1.0.0",
-
     # OpenAI SDK (stable)
     "openai>=1.42.0",
-
     # Gemini SDK
     "google-generativeai>=0.4.0",
-
     # HuggingFace Hub
     "huggingface_hub>=0.23.0",
-
     # Stable diffusers
     "diffusers>=0.30.0",
-
     # Core infra
     "pydantic>=2.0.0",
     "fastapi>=0.110.0",
     "uvicorn>=0.29.0",
-
     # Modal cloud execution
     "modal>=0.62.0",
+    "gradio>=5.49.1",
+    "mcp[cli]>=1.21.1",
 ]
 
 [project.scripts]

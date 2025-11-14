@@ -77,3 +77,6 @@ flagged/
 # Logs
 *.log
 logs/
+
+# Custom skills (local development only)
+custom_skills/
